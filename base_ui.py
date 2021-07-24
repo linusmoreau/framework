@@ -2401,6 +2401,7 @@ def run_loop(lock: threading.Lock,
              get_wids: Optional[Callable[[], List[Widget]]] = None,
              background: Optional[pygame.Surface] = None,
              fps: int = 60,
+             show_fps: bool = True,
              escape: bool = True,
              channel: Any = None):
 
@@ -2486,11 +2487,12 @@ def run_loop(lock: threading.Lock,
                 update_display(all_wids, background)
             old_mouse = mouse
 
-        frame += 1
-        nt = time.time()
-        dif = nt - t
-        if dif >= 1:
-            fps_txt.update(str(round(frame / dif)) + ' ' + 'FPS', align=BOTTOMRIGHT, pos=screen_rect.bottomright)
-            t = nt
-            frame = 0
+        if show_fps:
+            frame += 1
+            nt = time.time()
+            dif = nt - t
+            if dif >= 1:
+                fps_txt.update(str(round(frame / dif)) + ' ' + 'FPS', align=BOTTOMRIGHT, pos=screen_rect.bottomright)
+                t = nt
+                frame = 0
         clock.tick(fps)
