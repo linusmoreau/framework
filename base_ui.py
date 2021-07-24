@@ -2036,7 +2036,7 @@ class TextInput(Widget):
 
     def __init__(self, text, position, area, font_size=BASE_FONT_SIZE, font="couriernew", align=CENTER,
                  colour=whitish, background_colour=black, default_alpha=255,
-                 multiline=False, justify="left"):
+                 multiline=False, justify=LEFT):
         super().__init__(position, area, align=align)
         self.surface.fill(background_colour)
         self.text = text
