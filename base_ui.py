@@ -1366,11 +1366,11 @@ class Image(Widget):
         img_dimension_ratio = width / height
         area_dimension_ratio = self.cropped_x / self.cropped_y
         if img_dimension_ratio >= area_dimension_ratio:
-            self.height = self.cropped_y
-            self.width = int(self.height / height * width)
-        else:
             self.width = self.cropped_x
             self.height = int(self.width / width * height)
+        else:
+            self.height = self.cropped_y
+            self.width = int(self.height / height * width)
         self.dimensions = (int(self.width), int(self.height))
         try:
             self.surface = pygame.transform.smoothscale(surface, self.dimensions)
