@@ -1,6 +1,6 @@
 import os
 import threading
-from typing import Dict, List, Any, Callable, Optional
+from typing import Dict, List, Any, Callable, Optional, Union
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 import pygame.gfxdraw
@@ -1733,10 +1733,10 @@ class GraphDisplay(Widget):
             else:
                 colour = grey
                 orig_colour = colour
-            if not self.intg and 2 - self.y_mag != 0:
-                txt = str(round(y_val, 2 - self.y_mag))
-            else:
+            if self.intg or self.y_mag > 2:
                 txt = str(int(round(y_val)))
+            else:
+                txt = str(round(y_val, 2 - self.y_mag))
             if line in self.tips_mem.keys():
                 num_tip = self.tips_mem[line]
                 if txt == num_tip.text:
@@ -1744,7 +1744,7 @@ class GraphDisplay(Widget):
                 num_tip.update(txt, align=RIGHT, pos=(x - offset, y_pos))
             else:
                 num_tip = Text(txt, (x - offset, y_pos), align=RIGHT,
-                           colour=black, background_colour=colour, solid_background=True, margin=2)
+                               colour=black, background_colour=colour, solid_background=True, margin=2)
                 self.tips_mem[line] = num_tip
             num_tip.surface.set_alpha(200)
             tips.append(num_tip)
@@ -1754,7 +1754,7 @@ class GraphDisplay(Widget):
                 line_tip.update(align=LEFT, pos=(x + offset, y_pos))
             else:
                 line_tip = Text(line, (x + offset, y_pos), align=LEFT,
-                               colour=black, background_colour=colour, solid_background=True, margin=2)
+                                colour=black, background_colour=colour, solid_background=True, margin=2)
                 self.line_tips_mem[line] = line_tip
             line_tip.surface.set_alpha(200)
             line_tips.append(line_tip)
@@ -1784,7 +1784,7 @@ class GraphDisplay(Widget):
         y_pos = self.rect.y + self.top_margin + self.graph_rect.h / 24
         if self.leader and len(order) >= 2:
             line = order[-1]
-            if self.intg or 2 - self.y_mag == 0:
+            if self.intg or self.y_mag > 2:
                 dif = str(round(y_vals[line] - y_vals[order[-2]]))
             else:
                 dif = str(round(y_vals[line] - y_vals[order[-2]], 2 - self.y_mag))
