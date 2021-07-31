@@ -2388,40 +2388,9 @@ def update():
 
 def set_cursor(num):
     if num == 0:
-        pygame.mouse.set_cursor(
-            (16, 19), (0, 0),
-            (128, 0, 192, 0, 160, 0, 144, 0, 136, 0, 132, 0, 130, 0, 129, 0, 128, 128, 128, 64, 128, 32, 128, 16, 129,
-             240, 137, 0, 148, 128, 164, 128, 194, 64, 2, 64, 1, 128),
-            (128, 0, 192, 0, 224, 0, 240, 0, 248, 0, 252, 0, 254, 0, 255, 0, 255, 128, 255, 192, 255, 224, 255, 240,
-             255, 240, 255, 0, 247, 128, 231, 128, 195, 192, 3, 192, 1, 128))
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
     elif num == 1:
-        hand_pointer = (
-            '      XX                ',
-            '     X..X               ',
-            '     X..X               ',
-            '     X..X               ',
-            '     X..XXX             ',
-            '     X..X..XXX          ',
-            '     X..X..X..XX        ',
-            '     X..X..X..X.X       ',
-            'XXX  X..X..X..X..X      ',
-            'X..X X.....X..X..X      ',
-            'X...XX........X..X      ',
-            ' X...X...........X      ',
-            ' X...............X      ',
-            '  X..............X      ',
-            '  X..............X      ',
-            '   X............X       ',
-            '   X............X       ',
-            '    X..........X        ',
-            '     X........X         ',
-            '      X......X          ',
-            '      XXXXXXXX          ',
-            '                        ',
-            '                        ',
-            '                        ')
-        datatuple, mask_tuple = pygame.cursors.compile(hand_pointer, black='X', white='.')
-        pygame.mouse.set_cursor((24, 24), (7, 0), datatuple, mask_tuple)
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
 
 
 class LoadingScreen(Widget):
