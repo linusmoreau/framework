@@ -2226,7 +2226,14 @@ class PopUp(Widget):
             close_b = Button((self.rect.right, self.rect.top), (size, size), align=TOPRIGHT,
                              colour=(200, 20, 20), border_thickness=2, parent=self, threed=False,
                              border_colour=gold)
-            close_b.label('X', colour=whitish, size=int(size * 3 / 4))
+            m = size * 3 / 4
+            surf = pygame.Surface((m, m))
+            surf.fill(white)
+            surf.set_colorkey(white)
+            pygame.draw.line(surf, gold, (0, 0), (m, m), width=3)
+            pygame.draw.line(surf, gold, (0, m), (m, 0), width=3)
+            cross = Widget(close_b.rect.center, (m, m), align=CENTER, surface=surf, catchable=False)
+            close_b.components.append(cross)
             close_b.callback(self.close)
             self.components.append(close_b)
         if borders:
