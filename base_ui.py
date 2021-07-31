@@ -2295,6 +2295,49 @@ class PopUp(Widget):
                 c.disappear(alpha_ratio, first=False)
 
 
+class DragContainer(Widget):
+    def __init__(self, parts=None, limited=False):
+        super().__init__((0, 0), (0, 0))
+        if parts is not None:
+            self.extensions = parts
+        self.dragged = False
+        self.rel = None
+        self.limited = limited
+
+    def handle(self, event, mouse):
+        if self.dragged:
+            dx = mouse[0] - self.rel[0]
+            dy = mouse[1] - self.rel[1]
+            for e in self.extensions:
+                e.move(dx, dy)
+            self.rel[0] += dx
+            self.rel[1] += dy
+        if self.on_top(mouse):
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed(3)[0] and not self.dragged:
+                self.dragged = True
+                self.rel = [mouse[0] - self.rect.x, mouse[1] - self.rect.y]
+            elif event.type == pygame.MOUSEBUTTONUP and not pygame.mouse.get_pressed(3)[0] and self.dragged:
+                self.dragged = False
+                self.rel = None
+
+    def on_top(self, pos):
+        if not self.limited:
+            return True
+        else:
+            for e in self.extensions:
+                if e.on_top(pos):
+                    return True
+            else:
+                return False
+
+    def add_part(self, part):
+        self.extensions.append(part)
+
+    def remove_part(self, part):
+        self.extensions.remove(part)
+
+
+
 def set_highlight_colour(shade):
     shade = shade * colour_ratio
     if shade > 255:
