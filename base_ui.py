@@ -1548,6 +1548,7 @@ class GraphDisplay(Widget):
         self.vlines = vlines
         self.vlines_width = vlines_width
         self.intg = intg
+        self.place = None
 
         self.top_margin = self.rect.h / 12
         self.bottom_margin = self.rect.h / 12
@@ -1671,7 +1672,7 @@ class GraphDisplay(Widget):
                 return True
             else:
                 self.no_focus()
-            return False
+        return False
 
     def no_focus(self):
         self.moment(self.get_x_max() - self.x_min)
@@ -1711,14 +1712,16 @@ class GraphDisplay(Widget):
                 self.at_line = Widget((x, self.graph_rect.y), (1, self.graph_rect.h), surface=surface, default_alpha=50)
                 self.set_tool_tips(place, x, y_vals)
                 self.components.append(self.at_line)
+                self.place = place
             else:
-                if self.at_line.rect.x != x:
+                if place != self.place:
                     Widget.change = True
                     self.at_line.rect.x = x
                     self.at_line.extensions.clear()
                     self.set_tool_tips(place, x, y_vals)
                     if self.at_line not in self.components:
                         self.components.append(self.at_line)
+                    self.place = place
 
     def get_val(self, line, x):
         points = self.dat[line]
