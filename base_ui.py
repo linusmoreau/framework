@@ -1793,8 +1793,12 @@ class GraphDisplay(Widget):
             line_tips.append(line_tip)
 
             s = Widget((x, round(y_pos)), (2 * r + 1, 2 * r + 1), align=CENTER)
-            s.surface.fill(white)
-            s.surface.set_colorkey(white)
+            if orig_colour == black:
+                back = grey
+            else:
+                back = light_grey
+            s.surface.fill(back)
+            s.surface.set_colorkey(back)
             pygame.gfxdraw.aacircle(s.surface, r, r, r, orig_colour)
             pygame.gfxdraw.filled_circle(s.surface, r, r, r, orig_colour)
             self.at_line.extensions.append(s)
