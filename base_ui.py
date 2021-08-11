@@ -1587,16 +1587,20 @@ class GraphDisplay(Widget):
         y_range = self.y_max - self.y_min
 
         # Determine magnitude of difference in the y-variable
-        self.y_mag = int(math.log10(y_range))
-        self.y_step = 10 ** self.y_mag
-        while y_range / self.y_step < 6:
-            if self.y_step >= 1:
-                lcf = toolkit.least_prime_factor(self.y_step)
-                self.y_step //= lcf
-                if lcf >= 5:
-                    self.y_step *= 2
-            else:
-                self.y_step /= 2
+        if y_range != 0:
+            self.y_mag = int(math.log10(y_range))
+            self.y_step = 10 ** self.y_mag
+            while y_range / self.y_step < 6:
+                if self.y_step >= 1:
+                    lcf = toolkit.least_prime_factor(self.y_step)
+                    self.y_step //= lcf
+                    if lcf >= 5:
+                        self.y_step *= 2
+                else:
+                    self.y_step /= 2
+        else:
+            self.y_mag = 0
+            self.y_step = 1
 
         # Update extrema
         if y_min is None:
