@@ -2237,19 +2237,22 @@ class PopUp(Widget):
         super().__init__(pos, area, surface=surface, align=align, default_alpha=opacity, appearing=appearing)
         if close:
             size = screen_height / 40 + 1
-            close_b = Button((self.rect.right, self.rect.top), (size, size), align=TOPRIGHT,
-                             colour=(200, 20, 20), border_thickness=2, parent=self, threed=False,
-                             border_colour=gold)
+            self.close_b: Button \
+                = Button((self.rect.right, self.rect.top), (size, size), align=TOPRIGHT,
+                         colour=(200, 20, 20), border_thickness=2, parent=self, threed=False,
+                         border_colour=gold)
             m = size * 3 / 4
             surf = pygame.Surface((m, m))
             surf.fill(white)
             surf.set_colorkey(white)
             pygame.draw.line(surf, gold, (0, 0), (m, m), width=3)
             pygame.draw.line(surf, gold, (0, m), (m, 0), width=3)
-            cross = Widget(close_b.rect.center, (m, m), align=CENTER, surface=surf, catchable=False)
-            close_b.components.append(cross)
-            close_b.callback(self.close)
-            self.components.append(close_b)
+            cross = Widget(self.close_b.rect.center, (m, m), align=CENTER, surface=surf, catchable=False)
+            self.close_b.components.append(cross)
+            self.close_b.callback(self.close)
+            self.components.append(self.close_b)
+        else:
+            self.close_b = None
         if borders:
             self.draw_borders(thickness=2, color=gold)
         PopUp.instances.append(self)
@@ -2294,6 +2297,8 @@ class PopUp(Widget):
             PopUp.instances.remove(self)
             del self
         else:
+            if self.close_b is not None:
+                self.close_b.disable()
             self.disappearing = True
 
     def disappear(self, alpha_ratio, first=True):
