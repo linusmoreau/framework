@@ -1578,8 +1578,10 @@ class GraphDisplay(Widget):
 
         if self.y_min is None:
             self.y_min = min([min(self.dat[k].values()) for k in self.dat])
+            self.y_min -= abs(self.y_min) / 4
         if self.y_max is None:
             self.y_max = max([max(self.dat[k].values()) for k in self.dat])
+            self.y_max += abs(self.y_max) / 4
             if self.max_y_max is not None and self.y_max > self.max_y_max:
                 self.y_max = self.max_y_max
         y_range = self.y_max - self.y_min
