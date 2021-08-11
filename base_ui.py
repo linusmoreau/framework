@@ -1517,8 +1517,10 @@ class GraphDisplay(Widget):
         self.istime = istime
         if step != 1:
             self.dat = self.rescale(dat, step)
+            self.dat_points = self.rescale(dat_points, step)
         else:
             self.dat = dat
+            self.dat_points = dat_points
         if self.istime:
             self.initial_date: Date = initial_date
         if colours is None:
@@ -1527,7 +1529,6 @@ class GraphDisplay(Widget):
         super().__init__(position, area, align, surface)
         self.surface.fill(white)
         self.surface.set_colorkey(white)
-        self.dat_points = dat_points
         self.x_title = x_title
         self.y_title = y_title
         self.title = title
