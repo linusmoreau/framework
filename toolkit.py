@@ -114,11 +114,14 @@ def central_rolling_average(dat: Dict[float, List[float]], breadth: float):
 
 
 def variable_weight(disp, breadth, loc: float = 3):
-    w = (1 - (abs(disp) / breadth) ** 2) ** loc
-    if w < 0:
+    if abs(disp) > breadth:
         return 0
     else:
-        return w
+        w = (1 - (abs(disp) / breadth) ** 2) ** loc
+        if w < 0:
+            return 0
+        else:
+            return w
 
 
 def cube_weight(disp, breadth):
