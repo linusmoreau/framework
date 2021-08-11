@@ -1987,7 +1987,7 @@ class GraphDisplay(Widget):
                 colour = list(grey) + [120]
             for x, ys in points.items():
                 for y in ys:
-                    p = (round(self.graph_rect.w + self.left_margin - ((self.x_max - x) * self.x_scale)),
+                    p = (round(self.left_margin + ((x - self.x_min) * self.x_scale)),
                          round(self.rect.h - ((y - self.y_min) * self.y_scale + self.bottom_margin)))
                     if self.left_margin <= p[0] <= self.left_margin + self.graph_rect.w and \
                             self.top_margin <= p[1] <= self.top_margin + self.graph_rect.h:
