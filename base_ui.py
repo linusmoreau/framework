@@ -1867,15 +1867,16 @@ class GraphDisplay(Widget):
     def sketch_vlines(self):
         for x, desc in self.vlines.items():
             posx = round(self.left_margin + (x - self.x_min) / (self.x_max - self.x_min) * self.graph_rect.w)
-            pygame.gfxdraw.line(self.surface,
-                                posx, round(self.top_margin + self.graph_rect.h),
-                                posx, round(self.top_margin), dark_grey)
-            t = Text(desc, (posx, self.top_margin), align=BOTTOM, width=self.vlines_width,
-                     multiline=True, justify=RIGHT)
-            t.surface = pygame.transform.rotate(t.surface, 90)
-            t.rect = t.surface.get_rect()
-            t.rect.topright = posx, self.top_margin
-            self.components.append(t)
+            if self.left_margin <= posx <= self.left_margin + self.graph_rect.w:
+                pygame.gfxdraw.line(self.surface,
+                                    posx, round(self.top_margin + self.graph_rect.h),
+                                    posx, round(self.top_margin), dark_grey)
+                t = Text(desc, (posx, self.top_margin), align=BOTTOM, width=self.vlines_width,
+                         multiline=True, justify=RIGHT)
+                t.surface = pygame.transform.rotate(t.surface, 90)
+                t.rect = t.surface.get_rect()
+                t.rect.topright = posx, self.top_margin
+                self.components.append(t)
 
     def sketch_axes(self):
         zero_loc = None
