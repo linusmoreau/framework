@@ -1888,7 +1888,7 @@ class GraphDisplay(Widget):
             mark = round(self.y_min + self.y_step * i, 4)
             if mark == 0:
                 zero_loc = self.graph_rect.bottom - self.graph_rect.h / num * i
-            y = self.graph_rect.bottom - (self.y_step * i * self.y_scale)
+            y = round(self.graph_rect.bottom - (self.y_step * i * self.y_scale))
             t = Text(str(mark), (self.graph_rect.left - BASE_FONT_SIZE / 2, y), font_size=font_size, align=RIGHT)
             self.components.append(t)
             y -= self.rect.top
