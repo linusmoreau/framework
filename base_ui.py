@@ -1058,8 +1058,8 @@ class Text(Widget):
     def assemble_commands(self, text):
         command_secs = self.det_command_secs(text)
         # Assembling displayed text and commands to effect to the text
-        commands = []  # [{'c': (200, 100, 10), 'i': True}, etc.]
-        texts = []  # [0: "Hello", 25: "Bob", etc.]
+        commands = []   # [{'c': (200, 100, 10), 'i': True}, etc.]
+        texts = []      # [0: "Hello", 25: "Bob", etc.]
         point = 0
         order = []
         funcs: List[Any] = self.funcs.copy()
@@ -1273,7 +1273,10 @@ class Text(Widget):
                             newline = line[-1]
                             line = line[:-1]
                     lines.append(line)
-                    line = ''
+                    if newline is not None:
+                        line = newline
+                    else:
+                        line = ''
                     line_width = 0
             pos += 1
         lines.append(line)
@@ -1931,7 +1934,6 @@ class GraphDisplay(Widget):
                     txt = str(date.year)
                 else:
                     txt = date.__repr__()
-                # print(self.graph_rect.left, place, self.x_min, self.x_scale)
                 pos = (self.left_margin + (place - self.x_min) * self.x_scale, zero_loc)
                 self.x_axis_label(txt, pos, alignment, font_size)
                 self.x_axis_mark(pos)
