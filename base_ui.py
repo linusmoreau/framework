@@ -1749,6 +1749,13 @@ class GraphDisplay(Widget):
                 ret = None
         return ret
 
+    def get_rounded_values(self, value):
+        if self.intg or self.y_mag > 2:
+            txt = str(int(round(value)))
+        else:
+            txt = str(round(value, 2 - self.y_mag + self.y_mag == 2))
+        return txt
+
     def set_tool_tips(self, place, x, y_vals):
         x_val = place + self.x_min
         order = sorted(list(y_vals.keys()), key=lambda line: y_vals[line])
@@ -1769,10 +1776,7 @@ class GraphDisplay(Widget):
             else:
                 colour = grey
                 orig_colour = colour
-            if self.intg or self.y_mag > 2:
-                txt = str(int(round(y_val)))
-            else:
-                txt = str(round(y_val, 2 - self.y_mag))
+            txt = self.get_rounded_values(y_val)
             if line in self.tips_mem.keys():
                 num_tip = self.tips_mem[line]
                 if txt == num_tip.text:
@@ -1824,10 +1828,7 @@ class GraphDisplay(Widget):
         y_pos = self.rect.y + self.top_margin + self.graph_rect.h / 24
         if self.leader and len(order) >= 2:
             line = order[-1]
-            if self.intg or self.y_mag > 2:
-                dif = str(round(y_vals[line] - y_vals[order[-2]]))
-            else:
-                dif = str(round(y_vals[line] - y_vals[order[-2]], 2 - self.y_mag))
+            dif = self.get_rounded_values(y_vals[line] - y_vals[order[-2]])
             if line in self.colours:
                 colour = fade_colour(self.colours[line])
             else:
