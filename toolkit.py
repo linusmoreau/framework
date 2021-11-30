@@ -325,6 +325,28 @@ def least_prime_factor(num: int):
         raise ValueError
 
 
+def toRGB(inHEX: str):
+    key = {
+        'A': 10,
+        'B': 11,
+        'C': 12,
+        'D': 13,
+        'E': 14,
+        'F': 15
+    }
+
+    def char(c: str):
+        c = c.upper()
+        if c in key:
+            return key[c]
+        else:
+            return int(c)
+
+    return (char(inHEX[0]) * 16 + char(inHEX[1]),
+            char(inHEX[2]) * 16 + char(inHEX[3]),
+            char(inHEX[4]) * 16 + char(inHEX[5]))
+
+
 if __name__ == '__main__':
     votes = {'S': 924_940, 'DPP': 741_746, 'V': 685_188, 'RG': 274_463, 'LA': 265_129, 'A': 168_788,
              'SL': 161_009, 'SF': 147_578, 'C': 118_003}
