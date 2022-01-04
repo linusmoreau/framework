@@ -35,6 +35,7 @@ white = (255, 255, 255)
 grey = (200, 200, 200)
 light_grey = (220, 220, 220)
 dark_grey = (180, 180, 180)
+darkest_grey = (50, 50, 50)
 whitish = (250, 250, 250)
 gold = (212, 175, 55)
 green = (20, 200, 20)
@@ -1516,7 +1517,14 @@ class GraphDisplay(Widget):
 
     def __init__(self, position, area, dat, x_title=None, y_title=None, align=TOPLEFT,
                  x_min=None, x_max=None, y_min=None, y_max=None, leader=False, title=None, colours=None, istime=True,
-                 max_y_max=None, step=1, initial_date=None, dat_points=None, vlines=None, vlines_width=150, intg=False):
+                 max_y_max=None, step=1, initial_date=None, dat_points=None, vlines=None, vlines_width=150, intg=False,
+                 background_colour=None):
+        if background_colour is not None:
+            self.background_colour = background_colour
+            self.dark_mode = is_dark(background_colour)
+        else:
+            self.background_colour = white
+            self.dark_mode = False
         self.istime = istime
         if step != 1:
             self.dat = self.rescale(dat, step)
@@ -1530,8 +1538,8 @@ class GraphDisplay(Widget):
             colours = {}
         surface = pygame.Surface(area)
         super().__init__(position, area, align, surface)
-        self.surface.fill(white)
-        self.surface.set_colorkey(white)
+        self.surface.fill(background_colour)
+        self.surface.set_colorkey(background_colour)
         self.x_title = x_title
         self.y_title = y_title
         self.title = title
@@ -1718,7 +1726,10 @@ class GraphDisplay(Widget):
             if self.at_line is None:
                 Widget.change = True
                 surface = pygame.Surface((1, self.graph_rect.h))
-                surface.fill(black)
+                if self.dark_mode:
+                    surface.fill(whitish)
+                else:
+                    surface.fill(black)
                 self.at_line = Widget((x, self.graph_rect.y), (1, self.graph_rect.h), surface=surface, default_alpha=50)
                 self.set_tool_tips(place, x, y_vals)
                 self.components.append(self.at_line)
@@ -1845,19 +1856,27 @@ class GraphDisplay(Widget):
             pos = (lead.rect.centerx, lead.rect.top)
         else:
             pos = (x, y_pos)
-        x_pos = Text(txt, pos, align=BOTTOM)
+        if self.dark_mode:
+            colour = white
+        else:
+            colour = black
+        x_pos = Text(txt, pos, align=BOTTOM, background_colour=self.background_colour, colour=colour)
         self.at_line.extensions.append(x_pos)
 
     def set_titles(self):
+        if self.dark_mode:
+            text_colour = whitish
+        else:
+            text_colour = black
         font_size = self.heading_font_size
         if self.x_title is not None:
             heading = Text(self.x_title,
                            (self.rect.x + self.rect.w / 2, self.rect.y + self.rect.h - self.bottom_margin / 4),
-                           font_size=font_size)
+                           font_size=font_size, colour=text_colour, background_colour=self.background_colour)
             self.components.append(heading)
         if self.y_title is not None:
             heading = Text(self.y_title, (self.rect.x + self.left_margin / 2, self.rect.y + self.rect.h / 2),
-                           font_size=font_size)
+                           font_size=font_size, colour=text_colour, background_colour=self.background_colour)
             heading.surface = pygame.transform.rotate(heading.surface, 90)
             x, y = heading.rect.center
             heading.rect = heading.surface.get_rect()
@@ -1865,7 +1884,8 @@ class GraphDisplay(Widget):
             self.components.append(heading)
         if self.title is not None:
             title = Text(self.title, (self.graph_rect.x, self.rect.y + self.top_margin / 2),
-                         font_size=self.title_font_size, align=LEFT)
+                         font_size=self.title_font_size, align=LEFT,
+                         colour=text_colour, background_colour=self.background_colour)
             self.components.append(title)
 
     def sketch_vlines(self):
@@ -1876,7 +1896,8 @@ class GraphDisplay(Widget):
                                     posx, round(self.top_margin + self.graph_rect.h),
                                     posx, round(self.top_margin), dark_grey)
                 t = Text(desc, (posx, self.top_margin), align=BOTTOM, width=self.vlines_width,
-                         multiline=True, justify=RIGHT)
+                         multiline=True, justify=RIGHT, background_colour=self.background_colour,
+                         colour=whitish if self.dark_mode else black)
                 t.surface = pygame.transform.rotate(t.surface, 90)
                 t.rect = t.surface.get_rect()
                 t.rect.topright = posx, self.top_margin
@@ -1884,6 +1905,13 @@ class GraphDisplay(Widget):
 
     def sketch_axes(self):
         zero_loc = None
+
+        if self.dark_mode:
+            text_colour = whitish
+            line_colour = dark_grey
+        else:
+            text_colour = black
+            line_colour = light_grey
 
         # Draw y-axis intervals
         font_size = BASE_FONT_SIZE
@@ -1893,11 +1921,11 @@ class GraphDisplay(Widget):
             if mark == 0:
                 zero_loc = self.graph_rect.bottom - self.graph_rect.h / num * i
             y = round(self.graph_rect.bottom - (self.y_step * i * self.y_scale))
-            t = Text(str(mark), (self.graph_rect.left - BASE_FONT_SIZE / 2, y), font_size=font_size, align=RIGHT)
+            t = Text(str(mark), (self.graph_rect.left - BASE_FONT_SIZE / 2, y), font_size=font_size, align=RIGHT,
+                     colour=text_colour, background_colour=self.background_colour)
             self.components.append(t)
             y -= self.rect.top
-            pygame.draw.line(self.surface, light_grey, (self.left_margin, y),
-                             (self.left_margin + self.graph_rect.w, y))
+            pygame.draw.line(self.surface, line_colour, (self.left_margin, y), (self.left_margin + self.graph_rect.w, y))
 
         # Draw x-axis intervals
         step = 1
@@ -1936,8 +1964,8 @@ class GraphDisplay(Widget):
                 else:
                     txt = date.__repr__()
                 pos = (self.left_margin + (place - self.x_min) * self.x_scale, zero_loc)
-                self.x_axis_label(txt, pos, alignment, font_size)
-                self.x_axis_mark(pos)
+                self.x_axis_label(txt, pos, alignment, font_size, text_colour)
+                self.x_axis_mark(pos, line_colour)
                 if unit == 'month':
                     y = date.year
                     m = date.month
@@ -1958,19 +1986,20 @@ class GraphDisplay(Widget):
             for x in range(int(num) * step, -1, -step):
                 txt = str(self.x_min + x)
                 pos = (self.left_margin + x * self.x_scale, zero_loc)
-                self.x_axis_label(txt, pos, alignment, font_size)
-                self.x_axis_mark(pos)
+                self.x_axis_label(txt, pos, alignment, font_size, text_colour)
+                self.x_axis_mark(pos, line_colour)
 
         # Draw x-axis
         if self.y_min >= 0:
             zero_loc = self.top_margin + self.graph_rect.h  # Bottom
         elif self.y_max <= 0:
             zero_loc = self.top_margin  # Top
-        pygame.draw.line(self.surface, black,
+        pygame.draw.line(self.surface, text_colour,
                          (self.left_margin, zero_loc), (self.left_margin + self.graph_rect.w, zero_loc))
 
-    def x_axis_label(self, txt, pos, alignment, font_size):
-        t = Text(txt, (pos[0] + self.rect.left, pos[1]), font_size=font_size, align=alignment)
+    def x_axis_label(self, txt, pos, alignment, font_size, colour):
+        t = Text(txt, (pos[0] + self.rect.left, pos[1]), font_size=font_size, align=alignment, colour=colour,
+                 background_colour=self.background_colour)
         if alignment == BOTTOM:
             t.rect.bottom -= font_size * FONT_ASPECT
         else:
@@ -1978,8 +2007,8 @@ class GraphDisplay(Widget):
         # t.surface = pygame.transform.rotate(t.surface, 90)
         self.components.append(t)
 
-    def x_axis_mark(self, pos):
-        pygame.draw.line(self.surface, light_grey,
+    def x_axis_mark(self, pos, colour):
+        pygame.draw.line(self.surface, colour,
                          (pos[0], self.top_margin + self.graph_rect.h),
                          (pos[0], self.top_margin))
 
@@ -2462,6 +2491,10 @@ def update_display(wids, background):
     Widget.change = False
 
 
+def is_dark(colour):
+    return sum(colour[:3]) < 200
+
+
 def run_loop(lock: threading.Lock,
              get_wids: Optional[Callable[[], List[Widget]]] = None,
              background: Optional[pygame.Surface] = None,
@@ -2487,7 +2520,7 @@ def run_loop(lock: threading.Lock,
     frame = 0
     t = time.time()
     background_colour = background.get_at(screen_rect.center)
-    if sum(background_colour[:3]) < 50:
+    if is_dark(background_colour):
         txt_colour = whitish
     else:
         txt_colour = black
