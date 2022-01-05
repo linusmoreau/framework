@@ -1726,10 +1726,7 @@ class GraphDisplay(Widget):
             if self.at_line is None:
                 Widget.change = True
                 surface = pygame.Surface((1, self.graph_rect.h))
-                if self.dark_mode:
-                    surface.fill(whitish)
-                else:
-                    surface.fill(black)
+                surface.fill(whitish if self.dark_mode else black)
                 self.at_line = Widget((x, self.graph_rect.y), (1, self.graph_rect.h), surface=surface, default_alpha=50)
                 self.set_tool_tips(place, x, y_vals)
                 self.components.append(self.at_line)
@@ -1811,10 +1808,7 @@ class GraphDisplay(Widget):
             line_tips.append(line_tip)
 
             s = Widget((x, round(y_pos)), (2 * r + 1, 2 * r + 1), align=CENTER)
-            if orig_colour == black:
-                back = grey
-            else:
-                back = light_grey
+            back = self.background_colour
             s.surface.fill(back)
             s.surface.set_colorkey(back)
             pygame.gfxdraw.aacircle(s.surface, r, r, r, orig_colour)
@@ -1908,7 +1902,7 @@ class GraphDisplay(Widget):
 
         if self.dark_mode:
             text_colour = whitish
-            line_colour = dark_grey
+            line_colour = tuple(v * 2 for v in darkest_grey)
         else:
             text_colour = black
             line_colour = light_grey
@@ -1925,7 +1919,8 @@ class GraphDisplay(Widget):
                      colour=text_colour, background_colour=self.background_colour)
             self.components.append(t)
             y -= self.rect.top
-            pygame.draw.line(self.surface, line_colour, (self.left_margin, y), (self.left_margin + self.graph_rect.w, y))
+            pygame.draw.line(self.surface, line_colour, (self.left_margin, y),
+                             (self.left_margin + self.graph_rect.w, y))
 
         # Draw x-axis intervals
         step = 1
@@ -2013,19 +2008,26 @@ class GraphDisplay(Widget):
                          (pos[0], self.top_margin))
 
     def sketch_data(self):
+        r = 2
         for line, points in self.dat_points.items():
             if line in self.colours:
-                colour = list(self.colours[line])[:3] + [120]
+                colour = self.colours[line]
             else:
-                colour = list(grey) + [120]
+                colour = grey
             for x, ys in points.items():
                 for y in ys:
                     p = (round(self.left_margin + ((x - self.x_min) * self.x_scale)),
                          round(self.rect.h - ((y - self.y_min) * self.y_scale + self.bottom_margin)))
                     if self.left_margin <= p[0] <= self.left_margin + self.graph_rect.w and \
                             self.top_margin <= p[1] <= self.top_margin + self.graph_rect.h:
-                        pygame.gfxdraw.filled_circle(self.surface, p[0], p[1], 2, colour)
-                        pygame.gfxdraw.aacircle(self.surface, p[0], p[1], 2, colour)
+                        s = Widget(p, (2 * r + 1, 2 * r + 1), align=CENTER)
+                        back = darkest_grey if self.dark_mode else light_grey
+                        s.surface.fill(back)
+                        s.surface.set_colorkey(back)
+                        s.surface.set_alpha(100)
+                        pygame.gfxdraw.filled_circle(s.surface, r, r, r, colour)
+                        pygame.gfxdraw.aacircle(s.surface, r, r, r, colour)
+                        self.surface.blit(s.surface, (p[0] - r, p[1] - r))
 
     def sketch_curves(self):
         order = sorted(self.dat.keys(), key=lambda line: self.dat[line][max(self.dat[line].keys())])
@@ -2059,18 +2061,6 @@ class GraphDisplay(Widget):
                     pygame.draw.aaline(self.surface, line_colour,
                                        (points[j][0] + x_offset, points[j][1] + y_offset),
                                        (points[j + 1][0] + x_offset, points[j + 1][1] + y_offset))
-                # if j < len(points) - 2:
-                #     x1 = (points[j][0] + points[j + 1][0]) / 2
-                #     x2 = (points[j + 1][0] + points[j + 2][0]) / 2
-                #     y1 = (points[j][1] + points[j + 1][1]) / 2
-                #     y2 = (points[j + 1][1] + points[j + 2][1]) / 2
-                #     for a in range(num):
-                #         angle = a * 2 * math.pi / num
-                #         x_offset = radial_offset * math.cos(angle)
-                #         y_offset = radial_offset * math.sin(angle)
-                #         pygame.draw.aaline(self.surface, line_colour,
-                #                            (x1 + x_offset, y1 + y_offset),
-                #                            (x2 + x_offset, y2 + y_offset))
 
     def legend(self, order):
         notes = []
