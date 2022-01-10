@@ -75,11 +75,17 @@ class Date(CustomObject):
             month_length = get_month_length(month, year)
             year_length = get_year_length(year)
             if day > year_length:
-                day -= year_length
                 year += 1
+                if month <= 2:
+                    day -= year_length
+                else:
+                    day -= get_year_length(year)
             elif day <= -year_length:
                 year -= 1
-                day += year_length
+                if month <= 2:
+                    day += get_year_length(year)
+                else:
+                    day += year_length
             elif day > month_length:
                 day -= month_length
                 month += 1
