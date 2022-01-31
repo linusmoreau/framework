@@ -1958,7 +1958,7 @@ class GraphDisplay(Widget):
                     txt = str(date.year)
                 else:
                     txt = date.__repr__()
-                pos = (self.left_margin + (place - self.x_min) * self.x_scale, zero_loc)
+                pos = (self.left_margin + (place - self.x_min - 1) * self.x_scale, zero_loc)
                 self.x_axis_label(txt, pos, alignment, font_size, text_colour)
                 self.x_axis_mark(pos, line_colour)
                 if unit == 'month':
