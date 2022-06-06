@@ -1538,7 +1538,7 @@ class GraphDisplay(Widget):
             colours = {}
         surface = pygame.Surface(area)
         super().__init__(position, area, align, surface)
-        self.surface.fill(background_colour)
+        self.surface.fill(self.background_colour)
         self.surface.set_colorkey(background_colour)
         self.x_title = x_title
         self.y_title = y_title
@@ -1765,6 +1765,7 @@ class GraphDisplay(Widget):
         return txt
 
     def set_tool_tips(self, place, x, y_vals):
+        place = int(place)
         x_val = place + self.x_min
         order = sorted(list(y_vals.keys()), key=lambda line: y_vals[line])
 
@@ -1958,7 +1959,7 @@ class GraphDisplay(Widget):
                     txt = str(date.year)
                 else:
                     txt = date.__repr__()
-                pos = (self.left_margin + (place - self.x_min - 1) * self.x_scale, zero_loc)
+                pos = (self.left_margin + (place - self.x_min) * self.x_scale, zero_loc)
                 self.x_axis_label(txt, pos, alignment, font_size, text_colour)
                 self.x_axis_mark(pos, line_colour)
                 if unit == 'month':
