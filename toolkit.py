@@ -165,7 +165,10 @@ def weighted_average(dat: Dict[float, List[float]], breadth: float, res: int, lo
     else:
         maxi = upcome[-1]
     place = mini
-    step = (upcome[-1] - upcome[0]) / res
+    if len(upcome) == 1:
+        step = abs(upcome[0])
+    else:
+        step = (upcome[-1] - upcome[0]) / res
     while True:
         if place > maxi:
             place = maxi
