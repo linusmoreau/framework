@@ -1765,6 +1765,8 @@ class GraphDisplay(Widget):
         return txt
 
     def set_tool_tips(self, place, x, y_vals):
+        if len(y_vals) == 0:
+            return
         place = int(place)
         x_val = place + self.x_min
         order = sorted(list(y_vals.keys()), key=lambda line: y_vals[line])
@@ -1815,15 +1817,58 @@ class GraphDisplay(Widget):
             pygame.gfxdraw.aacircle(s.surface, r, r, r, orig_colour)
             pygame.gfxdraw.filled_circle(s.surface, r, r, r, orig_colour)
             self.at_line.extensions.append(s)
+
+        class Group:
+            def __init__(self, member, centre, unit_height):
+                self.members = {member}
+                self.centre = centre
+                self.unit_height = unit_height
+
+            def add(self, member, centre):
+                self.members.add(member)
+                self.centre += (centre - self.centre) / len(self.members)
+
+            def height(self):
+                return len(self.members) * self.unit_height
+
+            def bottom(self):
+                return self.centre + self.height() / 2
+
+            def top(self):
+                return self.centre - self.height() / 2
+
+            def merge(self, g):
+                self.members = self.members.union(g.members)
+                self.centre += (g.centre - self.centre) * len(g) / len(self)
+                return self
+
+            def overlap(self, g):
+                return self.bottom() > g.bottom() > self.top() or self.top() < g.top() < self.bottom() or \
+                       g.bottom() > self.bottom() > g.top() or g.top() < self.top() < g.bottom()
+
+            def __len__(self):
+                return len(self.members)
+
+        groups: List[Group] = []
+        height = tips[0].rect.height
+        for tip in tips:
+            groups.append(Group(tip, tip.rect.centery, height))
         while True:
-            for i in range(len(tips) - 1):
-                dif = tips[i + 1].rect.bottom - tips[i].rect.top
-                if dif > 0:
-                    tips[i].rect.y += dif / 2
-                    tips[i + 1].rect.y -= dif / 2
+            found = False
+            for i in range(len(groups) - 1):
+                for j in range(i + 1, len(groups)):
+                    if groups[i].overlap(groups[j]):
+                        groups = groups[:i] + groups[i+1:j] + groups[j+1:] + [groups[i].merge(groups[j])]
+                        found = True
+                        break
+                if found:
                     break
-            else:
+            if not found:
                 break
+        for g in groups:
+            ts = sorted(g.members, key=lambda m: m.rect.y)
+            for i, t in enumerate(ts):
+                t.rect.y = g.top() + i * height
         self.at_line.extensions.extend(tips)
         for i, tip in enumerate(line_tips):
             tip.rect.y = tips[i].rect.y
