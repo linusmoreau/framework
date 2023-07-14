@@ -1843,8 +1843,8 @@ class GraphDisplay(Widget):
                 return self
 
             def overlap(self, g):
-                return self.bottom() > g.bottom() > self.top() or self.top() < g.top() < self.bottom() or \
-                       g.bottom() > self.bottom() > g.top() or g.top() < self.top() < g.bottom()
+                return self.bottom() >= g.bottom() >= self.top() or self.top() <= g.top() <= self.bottom() or \
+                       g.bottom() >= self.bottom() >= g.top() or g.top() <= self.top() <= g.bottom()
 
             def __len__(self):
                 return len(self.members)
